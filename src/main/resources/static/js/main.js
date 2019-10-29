@@ -15,39 +15,61 @@ Vue.component('user-form', {
     props: ['users', 'userAttr'],
     data: function() {
         return {
+            id: '',
             firstName: '',
-            id: ''
+            lastName: '',
+            dateOfBirth: '',
+            address: ''
+
         }
     },
     watch: {
         userAttr: function(newVal, oldVal) {
-            this.firstName = newVal.firstName;
             this.id = newVal.id;
+            this.firstName = newVal.firstName;
+            this.lastName = newVal.lastName;
+            this.dateOfBirth = newVal.dateOfBirth;
+            this.address = newVal.address;
+
         }
     },
     template:
-        '<div>' +
-        '<input type="text" placeholder="Write something" v-model="firstName" />' +
-        '<input type="button" value="Save" @click="save" />' +
+        '<div class="container">' +
+        '<input class="mb-2" type="text" placeholder="First name" v-model="firstName" />' +
+        '<input class="mb-2" type="text" placeholder="Last name" v-model="lastName" />' +
+        '<input class="mb-2" type="date" placeholder="Date of birth" v-model="dateOfBirth" />' +
+        '<input class="mb-2" type="text" placeholder="Address" v-model="address" />' +
+        '<input class="btn btn-primary" type="button" value="Save" @click="save" />' +
         '</div>',
     methods: {
         save: function() {
-            var user = { firstName: this.firstName };
+            var user = {
+                firstName: this.firstName,
+                lastName: this.lastName,
+                dateOfBirth: this.dateOfBirth,
+                address: this.address
+            };
 
             if (this.id) {
                 userApi.update({id: this.id}, user).then(result =>
                 result.json().then(data => {
                     var index = getIndex(this.users, data.id);
                 this.users.splice(index, 1, data);
-                this.firstName = ''
-                this.id = ''
+                this.id = '';
+                this.firstName = '';
+                this.lastName = '';
+                this.dateOfBirth = '';
+                this.address = '';
             })
             )
             } else {
                 userApi.save({}, user).then(result =>
                 result.json().then(data => {
                     this.users.push(data);
-                this.firstName = ''
+                this.firstName = '';
+                this.lastName = '';
+                this.dateOfBirth = '';
+                this.address = '';
             })
             )
             }
@@ -57,13 +79,10 @@ Vue.component('user-form', {
 
 Vue.component('user-row', {
     props: ['user', 'editMethod', 'users'],
-    template: '<div>' +
-        '<i>({{ user.id }})</i> {{ user.firstName }}' +
-        '<span style="position: absolute; right: 0">' +
-        '<input type="button" value="Edit" @click="edit" />' +
-        '<input type="button" value="X" @click="del" />' +
-        '</span>' +
-        '</div>',
+    template:
+        '<tr><td>{{ user.id }}</td><td>{{ user.firstName }}</td><td>{{user.lastName}}</td><td>{{user.dateOfBirth}}</td><td>{{user.address}}</td>'+
+        '<td><input type="button" class="btn btn-secondary" value="Edit" @click="edit" /></td>'+
+        '<td><input type="button" class="btn btn-secondary" value="X" @click="del" /></td></tr>',
     methods: {
         edit: function() {
             this.editMethod(this.user);
@@ -88,8 +107,10 @@ Vue.component('users-list', {
     template:
         '<div style="position: relative; width: 300px;">' +
         '<user-form :users="users" :userAttr="user" />' +
-        '<user-row v-for="user in users" :key="user.id" :user="user" ' +
-        ':editMethod="editMethod" :users="users" />' +
+        '<table class="table table-hover">' +
+        '<tr><th>Id</th><th>Имя</th><th>Фамилия</th><th>Дата рождения</th><th>Адрес</th><th></th><th></th></tr>' +
+            '<user-row v-for="user in users" :key="user.id" :user="user" :editMethod="editMethod" :users="users" />' +
+        '</table>' +
         '</div>',
     created: function() {
         userApi.get().then(result =>
