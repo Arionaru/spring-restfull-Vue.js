@@ -1,3 +1,4 @@
+//Функция для получения ID пользователя
 function getIndex(list, id) {
     for (var i = 0; i < list.length; i++ ) {
         if (list[i].id === id) {
@@ -8,9 +9,10 @@ function getIndex(list, id) {
     return -1;
 }
 
-
+//подключение к rest Api
 var userApi = Vue.resource('/user{/id}');
 
+//форма для добавления и редакторования пользователей
 Vue.component('user-form', {
     props: ['users', 'userAttr'],
     data: function() {
@@ -77,6 +79,7 @@ Vue.component('user-form', {
     }
 });
 
+//вывод отдельного пользователя
 Vue.component('user-row', {
     props: ['user', 'editMethod', 'users'],
     template:
@@ -97,6 +100,7 @@ Vue.component('user-row', {
     }
 });
 
+//вывод всех пользователей
 Vue.component('users-list', {
     props: ['users'],
     data: function() {
